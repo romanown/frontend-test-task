@@ -14,12 +14,12 @@ app.get('/', (req, res) => {
   res.send('Hello World!');
 })
 
-app.post('/events', (req, res) => {
+app.get('/events', (req, res) => {
   let data = JSON.parse(fs.readFileSync('./data/events.json'));
   res.json({ items: data })
 })
 
-app.post('/resources', (req, res) => {
+app.get('/resources', (req, res) => {
   const data = JSON.parse(fs.readFileSync('./data/resources.json'));
   const body = req.body;
 

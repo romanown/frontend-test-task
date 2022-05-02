@@ -21,7 +21,7 @@ app.get('/events', (req, res) => {
 
 app.get('/resources', (req, res) => {
   const data = JSON.parse(fs.readFileSync('./data/resources.json'));
-  const body = req.body;
+  const body = req.query;
 
   let result = [];
 

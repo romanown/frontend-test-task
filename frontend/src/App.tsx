@@ -1,8 +1,10 @@
-import React from 'react';
+import React, {useEffect, Children, useState} from 'react';
+import type {FC} from 'react';
 import { Routes, Route, Link } from "react-router-dom";
+import axios from 'axios';
 import './App.css';
 
-function App() {
+const App: FC = () =>  {
   return (
     <div className="App">
       <header className="App-header">
@@ -18,7 +20,7 @@ function App() {
   );
 }
 
-const Home = () =>  {
+const Home: FC = () =>  {
   return (
     <>
       <main>
@@ -32,7 +34,37 @@ const Home = () =>  {
   );
 }
 
-const HistoryPage = () =>  {
+interface IEvent {
+    id: string;
+    appointmentId: string;
+    name: string;
+    resource: string;
+    date: string;
+}
+
+interface IEvents {
+    items: IEvent[];
+}
+
+const api = axios.create({
+    baseURL: 'http://localhost:5010',
+});
+
+const HistoryPage: FC = () =>  {
+    const [events, setEvents] = useState<IEvent[]>([]);
+    useEffect(() => {
+        api
+            .get('/events')
+            .then((res) => {
+                const eventsArray = res?.data?.items || [];
+                setEvents(eventsArray);
+            })
+            .catch((error) => {
+                // eslint-disable-next-line no-console
+                console.log(error);
+            });
+    }, []);
+
   return (
     <>
       <main>
@@ -45,8 +77,22 @@ const HistoryPage = () =>  {
       <nav>
         <Link to="/">Home</Link>
       </nav>
+        {Children.toArray(
+            events?.map((one:IEvent) => (
+<EventRow {...one} />
+                )))}
     </>
   );
+}
+
+const EventRow: FC<IEvent> = props =>  {
+    const {id, name} = props;
+    return (
+        <div>
+            {id}
+            {name}
+        </div>
+    );
 }
 
 export default App;

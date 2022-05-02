@@ -6,7 +6,7 @@ const cors = require('cors');
 const app = express();
 const port = 5010;
 
-app.use(cors())
+app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -21,7 +21,7 @@ app.get('/events', (req, res) => {
 
 app.get('/resources', (req, res) => {
   const data = JSON.parse(fs.readFileSync('./data/resources.json'));
-  const body = req.query;
+  const body = req.query; // TODO change back to body
 
   let result = [];
 

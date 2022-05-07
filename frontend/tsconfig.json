@@ -2,12 +2,21 @@
   "compilerOptions": {
     "target": "es5",
     "lib": [
+      "es6",
+      "webworker",
       "dom",
       "dom.iterable",
       "esnext"
     ],
     "allowJs": true,
+    "rootDir": "src",
+    "baseUrl": "src",
     "skipLibCheck": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "declaration": true,
+    "importHelpers": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
@@ -21,6 +30,6 @@
     "jsx": "react-jsx"
   },
   "include": [
-    "src"
+    "src/**/*"
   ]
 }

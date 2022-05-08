@@ -47,21 +47,22 @@ const api = axios.create({
 });
 
 const HistoryPage: FC = () => {
-  const [events, setEvents] = useState<IEvent[] | IKey>([]);
+  const [eventsLines, setEventsLines] = useState<IEvent[] | IKey>([]);
 
-  const groupBy = (xs: IEvent[], key: string): IKey =>
+  const groupBy = (xs: IEvent[] | IKey, key: string, defaultKey: string): IKey =>
     xs.reduce((acc: IKey, x: IKey) => {
-      const intKey = x[key] || key;
+      const intKey = x[key] || defaultKey;
       (acc[intKey] = acc[intKey] || []).push(x);
       return acc;
     }, {});
+  const grouppEvents = groupBy(eventsLines, 'appointmentId', 'noappointmentId');
 
   useEffect(() => {
     api
       .get('/events')
       .then((res) => {
         const eventsArray = res?.data?.items || [];
-        setEvents(groupBy(eventsArray, 'noappointmentId'));
+        setEventsLines(eventsArray);
       })
       .catch((error) => {
         // eslint-disable-next-line no-console
@@ -73,12 +74,17 @@ const HistoryPage: FC = () => {
     <>
       <main>
         <h2>HistoryPage</h2>
-        <p>That feels like an existential question, don't you think?</p>
+        <p>That feels like an existential question, don&apos;t you think?</p>
       </main>
       <nav>
         <Link to="/">Home</Link>
       </nav>
-      {Children.toArray(events?.map((one: IEvent) => <EventRow {...one} />))}
+      {Children.toArray(
+        Object.keys(grouppEvents)?.map((oneGroupp: any) =>
+          grouppEvents[oneGroupp]?.map((one: IEvent) => <EventRow {...one} />),
+        ),
+      )}
+      {Children.toArray(eventsLines?.map((one: IEvent) => <EventRow {...one} />))}
     </>
   );
 };

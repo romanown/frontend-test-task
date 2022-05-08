@@ -1,6 +1,6 @@
 import axios from 'axios';
 import type { FC } from 'react';
-import { Children, useEffect, useState } from 'react';
+import { Children, useEffect, useMemo, useState } from 'react';
 import { Link, Route, Routes } from 'react-router-dom';
 import './App.css';
 
@@ -49,13 +49,19 @@ const api = axios.create({
 const HistoryPage: FC = () => {
   const [eventsLines, setEventsLines] = useState<IEvent[] | IKey>([]);
 
-  const groupBy = (xs: IEvent[] | IKey, key: string, defaultKey: string): IKey =>
+  const groupBy = (xs: IEvent[] | IKey, key: string, priorityKey: string, defaultKey: string): IKey =>
     xs.reduce((acc: IKey, x: IKey) => {
-      const intKey = x[key] || defaultKey;
+      const intKey = x[key] || (x.name === priorityKey ? priorityKey : defaultKey);
       (acc[intKey] = acc[intKey] || []).push(x);
       return acc;
     }, {});
-  const grouppEvents = groupBy(eventsLines, 'appointmentId', 'noappointmentId');
+
+  const grouppEvents = useMemo(() => {
+    const arr = groupBy(eventsLines, 'appointmentId', 'Appointment', 'noappointmentId');
+    arr.noappointmentId?.sort((a: any, b: any) => Date.parse(a.date) - Date.parse(b.date));
+    arr.Appointment?.sort((a: any, b: any) => Date.parse(a.date) - Date.parse(b.date));
+    return arr;
+  }, [eventsLines]);
 
   useEffect(() => {
     api
@@ -79,12 +85,27 @@ const HistoryPage: FC = () => {
       <nav>
         <Link to="/">Home</Link>
       </nav>
+      Appointment
       {Children.toArray(
-        Object.keys(grouppEvents)?.map((oneGroupp: any) =>
-          grouppEvents[oneGroupp]?.map((one: IEvent) => <EventRow {...one} />),
-        ),
+        grouppEvents?.Appointment?.map((oneGroupp: any) => (
+          <>
+            <EventRow {...oneGroupp} />
+            {Children.toArray(grouppEvents[oneGroupp?.id]?.map((one: IEvent) => <EventRow {...one} />))}
+          </>
+        )),
       )}
-      {Children.toArray(eventsLines?.map((one: IEvent) => <EventRow {...one} />))}
+      noappointmentId
+      {Children.toArray(
+        grouppEvents?.noappointmentId?.map((oneGroupp: any) => (
+          <>
+            <EventRow {...oneGroupp} />
+            {Children.toArray(grouppEvents[oneGroupp?.id]?.map((one: IEvent) => <EventRow {...one} />))}
+          </>
+        )),
+      )}
+      {
+        //  Children.toArray(eventsLines?.map((one: IEvent) => <EventRow {...one} />))
+      }
     </>
   );
 };
@@ -94,9 +115,9 @@ const EventRow: FC<IEvent> = (props) => {
   return (
     <div>
       {id}&nbsp;&nbsp;&nbsp;&nbsp;
-      {appointmentId || ''}&nbsp;&nbsp;&nbsp;&nbsp;
+      {appointmentId || '____________________'}&nbsp;&nbsp;&nbsp;&nbsp;
       {name}&nbsp;&nbsp;&nbsp;&nbsp;
-      {resource}&nbsp;&nbsp;&nbsp;&nbsp;
+      {resource}&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;
       {date}&nbsp;&nbsp;&nbsp;&nbsp;
     </div>
   );

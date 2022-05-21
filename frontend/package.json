@@ -36,6 +36,8 @@
       "react-app",
       "react-app/jest",
       "airbnb",
+      "airbnb-typescript",
+      "airbnb-hooks",
       "prettier"
     ],
     "rules": {
@@ -46,11 +48,27 @@
         "files": [
           "**/*.ts?(x)"
         ],
+        "parser": "@typescript-eslint/parser",
         "rules": {
-          "additional-typescript-only-rule": "warn"
+          "additional-typescript-only-rule": "warn",
+          "import/order": [
+            "error",
+            {
+              "alphabetize": { "order": "asc", "caseInsensitive": false },
+              "groups": ["builtin", "external", "parent", "sibling", "index"],
+              "newlines-between": "always"
+            }
+          ],
+          "import/newline-after-import": "error"
         },
+        "plugins": [
+          "@typescript-eslint"
+        ],
         "parserOptions": {
-          "project": [",./tsconfig.json"]
+          "ecmaVersion": 2020,
+          "sourceType": "module",
+          "tsconfigRootDir": " __dirname",
+          "project": ["./tsconfig.json"]
         }
       }
     ]

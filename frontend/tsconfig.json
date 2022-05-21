@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es2020",
     "lib": [
       "es6",
       "webworker",
@@ -8,9 +8,12 @@
       "dom.iterable",
       "esnext"
     ],
+    "baseUrl": "src",
+    "paths": {
+      "@/*": ["./*"]
+    },
     "allowJs": true,
     "rootDir": "src",
-    "baseUrl": "src",
     "skipLibCheck": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
@@ -30,6 +33,6 @@
     "jsx": "react-jsx"
   },
   "include": [
-    "src/**/*"
+    ".eslintrc.js", "./src/**/*"
   ]
 }

@@ -1,7 +1,7 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const fs = require('fs');
-const cors = require('cors');
+const express = require("express");
+const bodyParser = require("body-parser");
+const fs = require("fs");
+const cors = require("cors");
 
 const app = express();
 const port = 5010;
@@ -10,18 +10,18 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get('/', (req, res) => {
-  res.send('Hello World!');
-})
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
 
-app.get('/events', (req, res) => {
-  let data = JSON.parse(fs.readFileSync('./data/events.json'));
-  res.json({ items: data })
-})
+app.get("/events", (req, res) => {
+  let data = JSON.parse(fs.readFileSync("./data/events.json"));
+  res.json({ items: data });
+});
 
-app.get('/resources', (req, res) => {
-  const data = JSON.parse(fs.readFileSync('./data/resources.json'));
-  const body = req.query; // TODO change back to body
+app.get("/resources", (req, res) => {
+  const data = JSON.parse(fs.readFileSync("./data/resources.json"));
+  const body = req.query; // not need use body on get
 
   let result = [];
 
@@ -36,7 +36,7 @@ app.get('/resources', (req, res) => {
   }
 
   res.json({ items: result });
-})
+});
 
 function findById(array, id) {
   let result;

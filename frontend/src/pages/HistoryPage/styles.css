@@ -1,9 +1,9 @@
-ody {
+body {
     max-height: 100vh;
     overflow: hidden;
 }
 
 .scrollable {
-    max-height: 100vh;
+    max-height: calc(100vh - 10vh - 10px);
     overflow: scroll;
 }

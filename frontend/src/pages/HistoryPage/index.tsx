@@ -1,9 +1,11 @@
 import axios from 'axios';
 import EventRow from 'components/events/EventRow';
-import type { FC } from 'react';
+import ResRow from 'components/events/ResRow';
+import { getParams } from 'helpers';
+import type { FC, UIEvent } from 'react';
 import { Children, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import type { IEvent, IKey } from 'types';
+import type { IEvent, IKey, IResurse } from 'types';
 
 import './styles.css';
 
@@ -15,6 +17,9 @@ const api = axios.create({
 
 const HistoryPage: FC = () => {
   const [eventsLines, setEventsLines] = useState<IEvent[] | IKey>([]);
+  const [resLines, setResLines] = useState<IResurse[] | IKey>([]);
+  const pageSize = 15;
+  const [page, setPage] = useState<number>(0);
 
   const groupBy = (xs: IEvent[] | IKey, key: string, priorityKey: string, defaultKey: string): IKey =>
     xs.reduce((acc: IKey, x: IKey) => {
@@ -25,17 +30,43 @@ const HistoryPage: FC = () => {
 
   const grouppEvents = useMemo(() => {
     const arr = groupBy(eventsLines, 'appointmentId', 'Appointment', 'noappointmentId');
-    arr.noappointmentId?.sort((a: any, b: any) => Date.parse(a.date) - Date.parse(b.date));
-    arr.Appointment?.sort((a: any, b: any) => Date.parse(a.date) - Date.parse(b.date));
+    arr.noappointmentId
+      ?.sort((a: any, b: any) => Date.parse(a.date) - Date.parse(b.date))
+      ?.slice(page * pageSize, page * pageSize + pageSize);
+    arr.Appointment?.sort((a: any, b: any) => Date.parse(a.date) - Date.parse(b.date))?.slice(
+      page * pageSize,
+      page * pageSize + pageSize,
+    );
+    arr.noappointmentId
+      ?.sort((a: any, b: any) => Date.parse(a.date) - Date.parse(b.date))
+      ?.slice(page * pageSize, page * pageSize + pageSize);
+    console.log(arr, page, page * pageSize, page * pageSize + pageSize);
     return arr;
-  }, [eventsLines]);
+  }, [eventsLines, page, pageSize]);
 
-  const handleScroll = (e: any) => {
+  const getRes = (ids: any[]) => {
+    const qstr = getParams({ ids });
+    api
+      .get(`/resources?${qstr}`)
+      .then((res) => {
+        const resArray = res?.data?.items || [];
+        setResLines(resArray);
+      })
+      .catch((error) => {
+        // eslint-disable-next-line no-console
+        console.log(error);
+      });
+  };
+
+  const handleScroll = (e: UIEvent<HTMLDivElement>) => {
     e.stopPropagation();
-    const bottom = Number((e.target.scrollHeight - e.target.scrollTop).toFixed(0)) - e.target.clientHeight < 50;
+    const bottom =
+      Number((e.currentTarget.scrollHeight - e.currentTarget.scrollTop).toFixed(0)) - e.currentTarget.clientHeight < 50;
     // const scrollBottom = e.target.scrollTop + e.target.offsetHeight === e.target.scrollHeight; // if div is wrapped data list
     if (bottom) {
       console.log('on bottom');
+      getRes(['Condition/62558a85f8354e3ceeeaf039', 'MedicationStatement/61f40bff82ce73530ec0121c']);
+      setPage(page + 1);
     }
   };
 
@@ -53,7 +84,7 @@ const HistoryPage: FC = () => {
   }, []);
 
   return (
-    <>
+    <div onScroll={handleScroll} className="Home scrollable">
       <main>
         <h2>HistoryPage</h2>
         <p>That feels like an existential question, don&apos;t you think?</p>
@@ -61,31 +92,37 @@ const HistoryPage: FC = () => {
       <nav>
         <Link to="/">Home</Link>
       </nav>
-      <div onScroll={handleScroll} className="Home scrollable">
-        Appointment
-        {Children.toArray(
-          grouppEvents?.Appointment?.map((oneGroupp: any) => (
-            <>
-              <EventRow {...oneGroupp} />
-              {Children.toArray(grouppEvents[oneGroupp?.id]?.map((one: IEvent) => <EventRow {...one} />))}
-            </>
-          )),
-        )}
-        noappointmentId
-        {Children.toArray(
-          grouppEvents?.noappointmentId?.map((oneGroupp: any) => (
-            <>
-              <EventRow {...oneGroupp} />
-              {Children.toArray(grouppEvents[oneGroupp?.id]?.map((one: IEvent) => <EventRow {...one} />))}
-            </>
-          )),
-        )}
-      </div>
+      Appointment
+      {Children.toArray(
+        grouppEvents?.Appointment?.slice(page * pageSize, page * pageSize + pageSize)?.map((oneGroupp: any) => (
+          <>
+            <EventRow {...oneGroupp} />
+            {Children.toArray(
+              grouppEvents[oneGroupp?.id]
+                ?.slice(page * pageSize, page * pageSize + pageSize)
+                ?.map((one: IEvent) => <EventRow {...one} />),
+            )}
+            {Children.toArray(resLines?.map((oneRes: IResurse) => <ResRow {...oneRes} />))}
+          </>
+        )),
+      )}
+      <div>noappointmentId</div>
+      {Children.toArray(
+        grouppEvents?.noappointmentId?.map((oneGroupp: any) => (
+          <>
+            <EventRow {...oneGroupp} />
+            {Children.toArray(
+              grouppEvents[oneGroupp?.id]
+                ?.slice(page * pageSize, page * pageSize + pageSize)
+                ?.map((one: IEvent) => <EventRow {...one} />),
+            )}
+          </>
+        )),
+      )}
       {
         //  Children.toArray(eventsLines?.map((one: IEvent) => <EventRow {...one} />))
       }
-      <div onScroll={handleScroll}>text</div>
-    </>
+    </div>
   );
 };
 

@@ -1,0 +1,9 @@
+ody {
+    max-height: 100vh;
+    overflow: hidden;
+}
+
+.scrollable {
+    max-height: 100vh;
+    overflow: scroll;
+}

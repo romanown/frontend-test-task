@@ -1,10 +1,11 @@
 import axios from 'axios';
-import './styles.css';
 import EventRow from 'components/events/EventRow';
 import type { FC } from 'react';
 import { Children, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { IEvent, IKey } from 'types';
+
+import './styles.css';
 
 const host: string | undefined = process.env.REACT_APP_BASE_URL;
 
@@ -29,6 +30,15 @@ const HistoryPage: FC = () => {
     return arr;
   }, [eventsLines]);
 
+  const handleScroll = (e: any) => {
+    e.stopPropagation();
+    const bottom = Number((e.target.scrollHeight - e.target.scrollTop).toFixed(0)) - e.target.clientHeight < 50;
+    // const scrollBottom = e.target.scrollTop + e.target.offsetHeight === e.target.scrollHeight; // if div is wrapped data list
+    if (bottom) {
+      console.log('on bottom');
+    }
+  };
+
   useEffect(() => {
     api
       .get('/events')
@@ -51,27 +61,30 @@ const HistoryPage: FC = () => {
       <nav>
         <Link to="/">Home</Link>
       </nav>
-      Appointment
-      {Children.toArray(
-        grouppEvents?.Appointment?.map((oneGroupp: any) => (
-          <>
-            <EventRow {...oneGroupp} />
-            {Children.toArray(grouppEvents[oneGroupp?.id]?.map((one: IEvent) => <EventRow {...one} />))}
-          </>
-        )),
-      )}
-      noappointmentId
-      {Children.toArray(
-        grouppEvents?.noappointmentId?.map((oneGroupp: any) => (
-          <>
-            <EventRow {...oneGroupp} />
-            {Children.toArray(grouppEvents[oneGroupp?.id]?.map((one: IEvent) => <EventRow {...one} />))}
-          </>
-        )),
-      )}
+      <div onScroll={handleScroll} className="Home scrollable">
+        Appointment
+        {Children.toArray(
+          grouppEvents?.Appointment?.map((oneGroupp: any) => (
+            <>
+              <EventRow {...oneGroupp} />
+              {Children.toArray(grouppEvents[oneGroupp?.id]?.map((one: IEvent) => <EventRow {...one} />))}
+            </>
+          )),
+        )}
+        noappointmentId
+        {Children.toArray(
+          grouppEvents?.noappointmentId?.map((oneGroupp: any) => (
+            <>
+              <EventRow {...oneGroupp} />
+              {Children.toArray(grouppEvents[oneGroupp?.id]?.map((one: IEvent) => <EventRow {...one} />))}
+            </>
+          )),
+        )}
+      </div>
       {
         //  Children.toArray(eventsLines?.map((one: IEvent) => <EventRow {...one} />))
       }
+      <div onScroll={handleScroll}>text</div>
     </>
   );
 };

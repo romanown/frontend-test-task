@@ -12,6 +12,7 @@
     "paths": {
       "@/*": ["./*"]
     },
+    "incremental": true,
     "allowJs": true,
     "rootDir": "src",
     "skipLibCheck": true,
@@ -33,6 +34,6 @@
     "jsx": "react-jsx"
   },
   "include": [
-    ".eslintrc.js", "./src/**/*"
+   "./src/**/*"
   ]
 }

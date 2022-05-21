@@ -1,10 +1,11 @@
 import axios from 'axios';
-import EventRow from 'components/events/EventRow';
-import ResRow from 'components/events/ResRow';
-import { getParams } from 'helpers';
 import type { FC, UIEvent } from 'react';
 import { Children, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+
+import EventRow from 'components/events/EventRow';
+import ResRow from 'components/events/ResRow';
+import { getParams } from 'helpers';
 import type { IEvent, IKey, IResurse } from 'types';
 
 import './styles.css';

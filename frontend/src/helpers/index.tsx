@@ -4,6 +4,6 @@ export const getParams = (params: any): string =>
       if (Array.isArray(params[key])) {
         return params[key].map((value: any) => `${key}[]=${value}`).join('&');
       }
-      return `${key}[]=${params[key]}`;
+      return typeof params[key] === 'object' ? `${key}=${JSON.stringify(params[key])}` : `${key}=${params[key]}`;
     })
     .join('&');

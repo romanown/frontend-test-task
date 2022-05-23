@@ -12,6 +12,7 @@
     "axios": "^0.27.2",
     "mobx": "^6.5.0",
     "mobx-react": "^7.3.0",
+    "mobx-react-lite": "^3.4.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-router": "^6.3.0",
@@ -54,8 +55,17 @@
           "import/order": [
             "error",
             {
-              "alphabetize": { "order": "asc", "caseInsensitive": false },
-              "groups": ["builtin", "external", "parent", "sibling", "index"],
+              "alphabetize": {
+                "order": "asc",
+                "caseInsensitive": false
+              },
+              "groups": [
+                "builtin",
+                "external",
+                "parent",
+                "sibling",
+                "index"
+              ],
               "newlines-between": "always"
             }
           ],
@@ -68,7 +78,9 @@
           "ecmaVersion": 2020,
           "sourceType": "module",
           "tsconfigRootDir": " __dirname",
-          "project": ["./tsconfig.json"]
+          "project": [
+            "./tsconfig.json"
+          ]
         }
       }
     ]

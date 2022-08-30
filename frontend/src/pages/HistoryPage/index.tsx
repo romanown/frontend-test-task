@@ -1,21 +1,15 @@
-import axios from 'axios';
 import { Observer, useLocalObservable } from 'mobx-react-lite';
 import type { FC, UIEvent } from 'react';
-import { Children, useEffect, useMemo, useState } from 'react';
+import { Children, useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import EventRow from 'components/events/EventRow';
 import ResRow from 'components/events/ResRow';
+import { runFetch } from 'data/api';
 import { getParams } from 'helpers';
 import type { IEvent, IKey, IResurse } from 'types';
 
 import './styles.css';
-
-const host: string | undefined = process.env.REACT_APP_BASE_URL;
-
-const api = axios.create({
-  baseURL: host,
-});
 
 const HistoryPage: FC = () => {
   const [eventsLines, setEventsLines] = useState<IEvent[] | IKey>([]);
@@ -30,14 +24,14 @@ const HistoryPage: FC = () => {
     },
   }));
 
-  const debounce = (callback: any, delay: number) => {
+  const debounce = useCallback((callback: any, delay: number) => {
     let timeout: any;
     const ex = () => {
       clearTimeout(timeout);
       timeout = setTimeout(callback, delay);
     };
     return ex;
-  };
+  }, []);
 
   const groupBy = (xs: IEvent[] | IKey, key: string, priorityKey: string, defaultKey: string): IKey =>
     xs.reduce((acc: IKey, x: IKey) => {
@@ -54,18 +48,10 @@ const HistoryPage: FC = () => {
     return arr;
   }, [eventsLines]);
 
-  const getRes = (ids: any[]) => {
+  const getRes = async (ids: any[]) => {
     const qstr = getParams({ ids });
-    api
-      .get(`/resources?${qstr}`)
-      .then((res) => {
-        const resArray = res?.data?.items || [];
-        setResLines(resArray);
-      })
-      .catch((error) => {
-        // eslint-disable-next-line no-console
-        console.log(error);
-      });
+    const getResLines = await runFetch(`/resources?${qstr}`, {});
+    setResLines(getResLines?.items || []);
   };
 
   const handleScroll = (e: UIEvent<HTMLDivElement>) => {
@@ -82,16 +68,11 @@ const HistoryPage: FC = () => {
   };
 
   useEffect(() => {
-    api
-      .get('/events')
-      .then((res) => {
-        const eventsArray = res?.data?.items || [];
-        setEventsLines(eventsArray);
-      })
-      .catch((error) => {
-        // eslint-disable-next-line no-console
-        console.log(error);
-      });
+    const eventsArray = async () => {
+      const data = await runFetch('/events', {});
+      setEventsLines(data?.items || []);
+    };
+    eventsArray();
   }, []);
 
   return (
